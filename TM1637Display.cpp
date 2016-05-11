@@ -21,12 +21,12 @@ extern "C" {
   #include <inttypes.h>
 }
 
-#include <TM1637Display.h>
+#include "TM1637Display.h"
 #include <Arduino.h>
 
 #define TM1637_I2C_COMM1    0x40
 #define TM1637_I2C_COMM2    0xC0
-#define TM1637_I2C_COMM3    0x80
+#define TM1637_I2C_COMM3    0x88
 
 //
 //      A
@@ -95,7 +95,7 @@ void TM1637Display::setSegments(const uint8_t segments[], uint8_t length, uint8_
 
 	// Write COMM3 + brightness
 	start();
-	writeByte(TM1637_I2C_COMM3 + (m_brightness & 0x0f));
+	writeByte(TM1637_I2C_COMM3 + (m_brightness & 0x07));
 	stop();
 }
  
