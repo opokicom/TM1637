@@ -58,11 +58,12 @@ TM1637Display::TM1637Display(uint8_t pinClk, uint8_t pinDIO)
     m_pinDIO = pinDIO;
 
     // Set the pin direction and default value.
-    // Both pins are set as inputs, allowing the pull-up resistors to pull them up
-    pinMode(m_pinClk, INPUT);
-    pinMode(m_pinDIO, INPUT);
-    digitalWrite(m_pinClk, LOW);
-    digitalWrite(m_pinDIO, LOW);
+    pinMode(m_pinDIO, OUTPUT);
+    digitalWrite(m_pinDIO, HIGH);
+
+    // Clock is set as output.
+    pinMode(m_pinClk, OUTPUT);
+    digitalWrite(m_pinClk, HIGH);
 }
 
 void TM1637Display::setBrightness(uint8_t brightness)
@@ -129,17 +130,19 @@ void TM1637Display::bitDelay()
 
 void TM1637Display::start()
 {
-    pinMode(m_pinDIO, OUTPUT);
+    digitalWrite(m_pinDIO, LOW);
     bitDelay();
 }
 
 void TM1637Display::stop()
 {
-    pinMode(m_pinDIO, OUTPUT);
+    digitalWrite(m_pinDIO, LOW);
     bitDelay();
-    pinMode(m_pinClk, INPUT);
+
+    digitalWrite(m_pinClk, HIGH);
     bitDelay();
-    pinMode(m_pinDIO, INPUT);
+
+    digitalWrite(m_pinDIO, HIGH);
     bitDelay();
 }
 
@@ -150,40 +153,38 @@ bool TM1637Display::writeByte(uint8_t b)
     // 8 Data Bits
     for (uint8_t i = 0; i < 8; ++i)
     {
-        // CLK low
-        pinMode(m_pinClk, OUTPUT);
+        digitalWrite(m_pinClk, LOW);
         bitDelay();
 
         // Set data bit
         if (data & 0x01)
-            pinMode(m_pinDIO, INPUT);
+            digitalWrite(m_pinDIO, HIGH);
         else
-            pinMode(m_pinDIO, OUTPUT);
+            digitalWrite(m_pinDIO, LOW);
 
         bitDelay();
 
-        // CLK high
-        pinMode(m_pinClk, INPUT);
+        digitalWrite(m_pinClk, HIGH);
         bitDelay();
+
         data = data >> 1;
     }
 
     // Wait for acknowledge
-    // CLK to zero
-    pinMode(m_pinClk, OUTPUT);
-    pinMode(m_pinDIO, INPUT);
+    digitalWrite(m_pinClk, LOW);
+    digitalWrite(m_pinDIO, HIGH);
     bitDelay();
 
-    // CLK to high
-    pinMode(m_pinClk, INPUT);
+    digitalWrite(m_pinClk, HIGH);
     bitDelay();
+
     uint8_t ack = digitalRead(m_pinDIO);
     if (ack == 0)
-        pinMode(m_pinDIO, OUTPUT);
-
+        digitalWrite(m_pinDIO, LOW);
 
     bitDelay();
-    pinMode(m_pinClk, OUTPUT);
+
+    digitalWrite(m_pinClk, LOW);
     bitDelay();
 
     return ack;
