@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <TM1637Display.h>
+#include "TM1637Display.h"
 
 // Module connection pins (Digital Pins)
 #define CLK 2
@@ -25,33 +25,33 @@ void loop()
 {
   int k;
   uint8_t data[] = { 0xff, 0xff, 0xff, 0xff };
-  display.setBrightness(0x0f);
-  
+  display.setBrightness(0x07);
+
   // All segments on
   display.setSegments(data);
   delay(TEST_DELAY);
-  
+
   // Selectively set different digits
   data[0] = 0b01001001;
   data[1] = display.encodeDigit(1);
   data[2] = display.encodeDigit(2);
   data[3] = display.encodeDigit(3);
-  
+
   for(k = 3; k >= 0; k--) {
 	display.setSegments(data, 1, k);
 	delay(TEST_DELAY);
 	}
-	
+
   display.setSegments(data+2, 2, 2);
   delay(TEST_DELAY);
-  
+
   display.setSegments(data+2, 2, 1);
   delay(TEST_DELAY);
-  
+
   display.setSegments(data+1, 3, 1);
   delay(TEST_DELAY);
- 
-  
+
+
   // Show decimal numbers with/without leading zeros
   bool lz = false;
   for (uint8_t z = 0; z < 2; z++) {
@@ -61,12 +61,12 @@ void loop()
 	}
 	lz = true;
   }
-  
+
   // Show decimal number whose length is smaller than 4
   for(k = 0; k < 4; k++)
 	data[k] = 0;
   display.setSegments(data);
-  
+
   display.showNumberDec(153, false, 3, 1);
   delay(TEST_DELAY);
   display.showNumberDec(22, false, 2, 2);
@@ -83,14 +83,14 @@ void loop()
   // Brightness Test
   for(k = 0; k < 4; k++)
 	data[k] = 0xff;
-  for(k = 0; k < 16; k++) {
+  for(k = 0; k < 8; k++) {
     display.setBrightness(k);
     display.setSegments(data);
     delay(TEST_DELAY);
   }
-    
+
   // Done!
   display.setSegments(SEG_DONE);
-  
+
   while(1);
 }
